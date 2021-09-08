@@ -1,0 +1,6 @@
+# Reflect any "hostname" and "ip" changes in "provisioning/hosts.yml" file
+  
+- name: RescueZilla1
+  label: RescueZilla1 - 192.168.100.100
+  hostname: rescuezilla1
+  ip: 192.168.100.100
