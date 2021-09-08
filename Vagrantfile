@@ -3,8 +3,7 @@ require "yaml"
 boxes = YAML.load_file("vagrant_hosts.yml")
 
 # Variablen
-IMAGE_NAME = "bento/ubuntu-20.04"
-VM_NUM = 1
+IMAGE_NAME = "ubuntu/focal64"
 VM_CPU = 2 
 VM_MEM = 2048
 VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
@@ -30,7 +29,7 @@ Vagrant.configure("2") do |config|
             if i == boxes.count
                 machine.vm.provision :ansible do |ansible|
                     ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-                    ansible.verbose = "-vvv"
+                    ansible.verbose = "-v"
                     ansible.limit = "all"
                     ansible.inventory_path = "provisioning/hosts.yml"
                     ansible.playbook = "provisioning/site.yml"
