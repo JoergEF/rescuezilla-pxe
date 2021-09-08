@@ -1,0 +1,9 @@
+---
+# This playbook contains common handlers that can be called in tasks.
+  
+# Service dnsmasq neustarten und in Bootvorgang integrieren
+- name: Restart dnsmasq
+  ansible.builtin.systemd:
+    name: dnsmasq
+    state: restarted
+    enabled: yes

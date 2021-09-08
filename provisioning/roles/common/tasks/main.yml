@@ -1,0 +1,55 @@
+---
+# This playbook contains common actions that will be run on "all" hosts.
+  
+# sudo apt-get update
+- name: Update apt packages
+  apt:
+    update_cache: yes
+  tags:
+    - system
+  
+# sudo timedatectl set-timezone Europe/Berlin
+- name: Set time zone to Europe/Berlin
+  timezone:
+    name: Europe/Berlin
+  tags:
+    - system
+  
+# Service systemd-resolved stoppen
+- name: Stop and remove systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+
+# sudo apt-get install dnsmasq
+- name: Install dnsmasq
+  apt:
+    name: dnsmasq
+    state: present
+    update_cache: yes
+  tags:
+    - dnsmasq
+
+# Configure dnsmasq
+- name: configure dnsmasq
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf.d/pxe.conf
+  notify: Restart dnsmasq
+  tags:
+    - dnsmasq
+  
+# sudo apt-get autoclean
+- name: Remove useless apt packages from the cache
+  apt:
+    autoclean: yes
+  tags:
+    - system
+  
+# sudo apt-get autoremove
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+  tags:
+    - system
