@@ -1,0 +1,9 @@
+---
+# This playbook sets up whole stack.
+  
+- name: Apply common configuration to "all" hosts
+  hosts: all
+  remote_user: root
+  become: yes
+  roles:
+    - common
