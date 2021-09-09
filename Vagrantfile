@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
             if i == boxes.count
                 machine.vm.provision :ansible do |ansible|
                     ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-                    ansible.verbose = "-v"
+                    # ansible.verbose = "-v"
                     ansible.limit = "all"
                     ansible.inventory_path = "provisioning/hosts.yml"
                     ansible.playbook = "provisioning/site.yml"

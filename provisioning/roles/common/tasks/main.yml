@@ -22,7 +22,17 @@
     state: stopped
     enabled: no
 
-# ###TODO: resolv.conf bauen
+# delete old resolv.conf (unlink)
+- name: Deleting old resolv.conf-file
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+# copy the new resolv.conf
+- name: Set name-resolution
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
 
 # sudo apt-get install dnsmasq
 - name: Install dnsmasq
@@ -37,7 +47,7 @@
 - name: configure dnsmasq
   template:
     src: dnsmasq.conf.j2
-    dest: /etc/dnsmasq.conf.d/pxe.conf
+    dest: /etc/dnsmasq.d/pxe.conf
   notify: Restart dnsmasq
   tags:
     - dnsmasq
