@@ -34,6 +34,26 @@
     src: resolv.conf.j2
     dest: /etc/resolv.conf
 
+# check tftp-Folder and create if not exists
+- name: check directory /srv/www
+  stat:
+    path: /srv/tftp
+  register: my_folder
+
+- name: "echo if directory already exists"
+  debug:
+    msg: "the tftp directory already exists"
+  when: my_folder.stat.exists
+
+- name: "Create directory if not exists"
+  file:
+    path: /srv/tftp
+    state: directory
+    mode: 0755
+    group: root
+    owner: root
+  when: my_folder.stat.exists == false
+
 # sudo apt-get install dnsmasq
 - name: Install dnsmasq
   apt:
