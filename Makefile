@@ -1,10 +1,12 @@
 new:
 	@echo Building VM...
 	@vagrant up
+	@vagrant reload
 
 fresh: clean
 	@echo Building VM...
 	@vagrant up
+	@vagrant reload
 
 clean:
 	@echo Removing VM...
