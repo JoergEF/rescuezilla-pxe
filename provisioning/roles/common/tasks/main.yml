@@ -72,6 +72,19 @@
   tags:
     - dnsmasq
 
+# Download pxe-Bootfile
+- name: Download PXE-File
+  get_url:
+    url: http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/pxelinux.0
+    dest: /srv/tftp/pxelinux.0
+
+# sudo apt-get dist-upgrade
+- name: Install distribution upgrades
+  apt:
+    upgrade: dist
+  tags:
+    - system
+
 # sudo apt-get autoclean
 - name: Remove useless apt packages from the cache
   apt:
