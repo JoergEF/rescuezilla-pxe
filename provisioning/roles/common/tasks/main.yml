@@ -35,7 +35,7 @@
     dest: /etc/resolv.conf
 
 # check tftp-Folder and create if not exists
-- name: check directory /srv/www
+- name: check directory /srv/tftp
   stat:
     path: /srv/tftp
   register: my_folder
@@ -54,14 +54,17 @@
     owner: root
   when: my_folder.stat.exists is false
 
-# sudo apt-get install dnsmasq
-- name: Install dnsmasq
+# sudo apt-get install dnsmasq and syslinux-common
+- name: Install necessary Packages
   apt:
-    name: dnsmasq
+    pkg: 
+      - dnsmasq
+      - syslinux-common
     state: present
     update_cache: no
   tags:
     - dnsmasq
+    - syslinux
 
 # Configure dnsmasq
 - name: configure dnsmasq
@@ -77,6 +80,57 @@
   get_url:
     url: http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/pxelinux.0
     dest: /srv/tftp/pxelinux.0
+
+# Download Resuezilla-ISO
+- name: Downloading RecueZilla-Image
+  get_url: 
+    url: https://github.com/rescuezilla/rescuezilla/releases/download/2.2/rescuezilla-2.2-64bit.focal.iso
+    dest: /tmp/rescuezilla.iso
+
+# Extract netboot-Files
+# this needs the community.general collection, install it (on host) with
+# ansible-galaxy collection install community.general
+- name: Extract netboot-Files from ISO
+  community.general.iso_extract:
+    image: /tmp/rescuezilla.iso
+    dest: /srv/tftp
+    files:
+      - casper/vmlinuz
+      - casper/initrd.lz
+
+- name: Deleting RescueZilla ISO
+  file:
+    path: /tmp/rescuezilla.iso
+    state: absent
+
+- name: Copy Bootmenu
+  copy:
+    src: /usr/lib/syslinux/modules/bios/ldlinux.c32
+    dest: /srv/tftp
+
+- name: check Bootmenu-Directory
+  stat:
+    path: /srv/tftp/pxelinux.cfg
+  register: my_bootfolder
+
+- name: "echo if directory already exists"
+  debug:
+    msg: "the bootmenu directory already exists"
+  when: my_bootfolder.stat.exists
+
+- name: "Create directory if not exists"
+  file:
+    path: /srv/tftp/pxelinux.cfg
+    state: directory
+    mode: 0755
+    group: root
+    owner: root
+  when: my_bootfolder.stat.exists is false
+
+- name: Creating Bootmenmu
+  template:
+    src: pxelinux.default.j2
+    dest: /srv/tftp/pxelinux.cfg/default
 
 # sudo apt-get dist-upgrade
 - name: Install distribution upgrades
